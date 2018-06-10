@@ -1,0 +1,66 @@
+# coding:utf8
+#python操作Mongodb增删改查
+'''
+首先启动MongoDB 到MongoDB目录下 运行DOS命令 .\mongod.exe --dbpath ./data
+Mongodb可视化工具用：roboMongo
+mongodb的条件操作符
+
+ (>)  大于 - $gt
+ (<)  小于 - $lt
+( >=)  大于等于 - $gte
+(<= )  小于等于 - $lte
+
+'''
+__author__ = 'liyatao'
+import pymongo
+conn=pymongo.MongoClient(host='127.0.0.1',port=27017)  
+db=conn.Liyatao1         #连接mongodb数据库，没有则自动创建
+post_info=db.test        #使用test集合，如果不存在自动创建
+
+liyatao_info={"name":u"李亚涛","age":"18","work":"seo","skill":"python"}
+liyatao_info1={"name":u"李亚涛","age":"28","work":"seo","skill":"python","money":"12000"}
+liyatao_info2={"name":u"李亚涛","age":"28","work":"seo",}
+liyatao_list=[{"name":"liyatao","home":"zhoukou"},{"name":"taotao","home":"changsha"}]
+
+#----------数据统计-------------
+db_count=post_info.count()
+print '数据库共有数据：',db_count
+
+#--------------python 插入数据到MongoDB--------------
+post_info.insert(liyatao_info)
+post_info.insert(liyatao_info1)
+post_info.insert(liyatao_info2)
+post_info.insert_many(liyatao_list)    #批量插入多条数据
+print u'操作数据库完成'
+
+#-----------python操作MongoDB删除数据--------------
+#post_info.remove({"age":"28"})
+
+#---------------python查询MongoDB数据库--------------------------
+result=post_info.find_one({"age":"28"})    #查询第1个 age=28的数据
+print '查询第1个age=28的数据',result
+
+#查询name=liyatao的数据
+result=post_info.find({"name":"liyatao"})
+for each in result:
+    print 'name=liyatao的数据:',each
+
+#查询全部数据
+resule_all=post_info.find()
+
+for each in resule_all:
+    print '所有数据：',each
+
+
+#------------python操作Mongodb更新数据--------------------
+'''
+db.collection.update( criteria, objNew, upsert, multi )
+
+criteria : update的查询条件，类似sql update查询内where后面的
+objNew   : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+upsert   : 这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+multi    : mongodb默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+
+'''
+post_info.update({"name":"liyatao"},{"$set":{"name":"liyatao_update"}},upsert=False,multi=True) #全更新了
+# post_info.update({"name":"liyatao_update222"},{"$set":{"name":"liyatao2"}},upsert=True,multi=True) #全部添加加进去
